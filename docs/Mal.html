@@ -1,0 +1,4867 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Direct Messages - Mal</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <style>
+        /* General */
+
+@font-face {
+    font-family: Whitney;
+    src: url(https://cdn.jsdelivr.net/gh/Tyrrrz/DiscordFonts@master/whitney-300.woff);
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: Whitney;
+    src: url(https://cdn.jsdelivr.net/gh/Tyrrrz/DiscordFonts@master/whitney-400.woff);
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: Whitney;
+    src: url(https://cdn.jsdelivr.net/gh/Tyrrrz/DiscordFonts@master/whitney-500.woff);
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: Whitney;
+    src: url(https://cdn.jsdelivr.net/gh/Tyrrrz/DiscordFonts@master/whitney-600.woff);
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: Whitney;
+    src: url(https://cdn.jsdelivr.net/gh/Tyrrrz/DiscordFonts@master/whitney-700.woff);
+    font-weight: 700;
+}
+
+body {
+    font-family: "Whitney", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+img {
+    object-fit: contain;
+}
+
+.markdown {
+    max-width: 100%;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+}
+
+.preserve-whitespace {
+    white-space: pre-wrap;
+}
+
+.spoiler {
+    /* width: fit-content; */
+    display: inline-block;
+    /* This is more consistent across browsers, the old attribute worked well under Chrome but not FireFox. */
+}
+
+.spoiler--hidden {
+    cursor: pointer;
+}
+
+.spoiler-text {
+    border-radius: 3px;
+}
+
+.spoiler--hidden .spoiler-text {
+    color: rgba(0, 0, 0, 0);
+}
+
+.spoiler--hidden .spoiler-text::selection {
+    color: rgba(0, 0, 0, 0);
+}
+
+.spoiler-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+}
+
+.spoiler--hidden .spoiler-image {
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.spoiler--hidden .spoiler-image * {
+    filter: blur(44px);
+}
+
+.spoiler--hidden .spoiler-image:after {
+    content: "SPOILER";
+    color: #dcddde;
+    background-color: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    padding: 100%;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    font-size: 0.9em;
+}
+
+.spoiler--hidden:hover .spoiler-image:after {
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.quote {
+    margin: 0.1em 0;
+    padding-left: 0.6em;
+    border-left: 4px solid;
+    border-radius: 3px;
+}
+
+.pre {
+    font-family: "Consolas", "Courier New", Courier, monospace;
+}
+
+.pre--multiline {
+    margin-top: 0.25em;
+    padding: 0.5em;
+    border: 2px solid;
+    border-radius: 5px;
+}
+
+.pre--inline {
+    padding: 2px;
+    border-radius: 3px;
+    font-size: 0.85em;
+}
+
+.mention {
+    border-radius: 3px;
+    padding: 0 2px;
+    color: #7289da;
+    background: rgba(114, 137, 218, .1);
+    font-weight: 500;
+}
+
+.emoji {
+    width: 1.25em;
+    height: 1.25em;
+    margin: 0 0.06em;
+    vertical-align: -0.4em;
+}
+
+.emoji--small {
+    width: 1em;
+    height: 1em;
+}
+
+.emoji--large {
+    width: 2.8em;
+    height: 2.8em;
+}
+
+/* Preamble */
+
+.preamble {
+    display: grid;
+    margin: 0 0.3em 0.6em 0.3em;
+    max-width: 100%;
+    grid-template-columns: auto 1fr;
+}
+
+.preamble__guild-icon-container {
+    grid-column: 1;
+}
+
+.preamble__guild-icon {
+    max-width: 88px;
+    max-height: 88px;
+}
+
+.preamble__entries-container {
+    grid-column: 2;
+    margin-left: 0.6em;
+}
+
+.preamble__entry {
+    font-size: 1.4em;
+}
+
+.preamble__entry--small {
+    font-size: 1em;
+}
+
+/* Chatlog */
+
+.chatlog {
+    max-width: 100%;
+}
+
+.chatlog__message-group {
+    display: grid;
+    margin: 0 0.6em;
+    padding: 0.9em 0;
+    border-top: 1px solid;
+    grid-template-columns: auto 1fr;
+}
+
+.chatlog__reference-symbol {
+    grid-column: 1;
+    border-style: solid;
+    border-width: 2px 0 0 2px;
+    border-radius: 8px 0 0 0;
+    margin-left: 16px;
+    margin-top: 8px;
+}
+
+.chatlog__reference {
+    display: flex;
+    grid-column: 2;
+    margin-left: 1.2em;
+    margin-bottom: 0.25em;
+    font-size: 0.875em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    align-items: center;
+}
+
+.chatlog__reference-avatar {
+    border-radius: 50%;
+    height: 16px;
+    width: 16px;
+    margin-right: 0.25em;
+}
+
+.chatlog__reference-name {
+    margin-right: 0.25em;
+    font-weight: 600;
+}
+
+.chatlog__reference-link {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chatlog__reference-link:hover {
+    text-decoration: none;
+}
+
+.chatlog__reference-content > * {
+    display: inline;
+}
+
+.chatlog__reference-edited-timestamp {
+    margin-left: 0.25em;
+    font-size: 0.8em;
+}
+
+.chatlog__author-avatar-container {
+    grid-column: 1;
+    width: 40px;
+    height: 40px;
+}
+
+.chatlog__author-avatar {
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+}
+
+.chatlog__messages {
+    grid-column: 2;
+    margin-left: 1.2em;
+    min-width: 50%;
+}
+
+.chatlog__author-name {
+    font-weight: 500;
+}
+
+.chatlog__timestamp {
+    margin-left: 0.3em;
+    font-size: 0.75em;
+}
+
+.chatlog__message {
+    padding: 0.1em 0.3em;
+    margin: 0 -0.3em;
+    background-color: transparent;
+    transition: background-color 1s ease;
+}
+
+.chatlog__content {
+    font-size: 0.95em;
+    word-wrap: break-word;
+}
+
+.chatlog__edited-timestamp {
+    margin-left: 0.15em;
+    font-size: 0.8em;
+}
+
+.chatlog__attachment {
+    margin-top: 0.3em;
+}
+
+.chatlog__attachment-thumbnail {
+    vertical-align: top;
+    max-width: 45vw;
+    max-height: 500px;
+    border-radius: 3px;
+}
+
+.chatlog__attachment-container {
+    height: 40px;
+    width: 100%;
+    max-width: 520px;
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.chatlog__attachment-icon {
+    float: left;
+    height: 100%;
+    margin-right: 10px;
+}
+
+.chatlog__attachment-icon > .a {
+    fill: #f4f5fb;
+    d: path("M50,935a25,25,0,0,1-25-25V50A25,25,0,0,1,50,25H519.6L695,201.32V910a25,25,0,0,1-25,25Z");
+}
+
+.chatlog__attachment-icon > .b {
+    fill: #7789c4;
+    d: path("M509.21,50,670,211.63V910H50V50H509.21M530,0H50A50,50,0,0,0,0,50V910a50,50,0,0,0,50,50H670a50,50,0,0,0,50-50h0V191Z");
+}
+
+.chatlog__attachment-icon > .c {
+    fill: #f4f5fb;
+    d: path("M530,215a25,25,0,0,1-25-25V50a25,25,0,0,1,16.23-23.41L693.41,198.77A25,25,0,0,1,670,215Z");
+}
+
+.chatlog__attachment-icon > .d {
+    fill: #7789c4;
+    d: path("M530,70.71,649.29,190H530V70.71M530,0a50,50,0,0,0-50,50V190a50,50,0,0,0,50,50H670a50,50,0,0,0,50-50Z");
+}
+
+.chatlog__attachment-filesize {
+    color: #72767d;
+    font-size: 12px;
+}
+
+.chatlog__attachment-filename {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.chatlog__embed {
+    display: flex;
+    margin-top: 0.3em;
+    max-width: 520px;
+}
+
+.chatlog__embed-color-pill {
+    flex-shrink: 0;
+    width: 0.25em;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.chatlog__embed-content-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5em 0.6em;
+    border: 1px solid;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.chatlog__embed-content {
+    display: flex;
+    width: 100%;
+}
+
+.chatlog__embed-text {
+    flex: 1;
+}
+
+.chatlog__embed-author {
+    display: flex;
+    margin-bottom: 0.3em;
+    align-items: center;
+}
+
+.chatlog__embed-author-icon {
+    margin-right: 0.5em;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.chatlog__embed-author-name {
+    font-size: 0.875em;
+    font-weight: 600;
+}
+
+.chatlog__embed-title {
+    margin-bottom: 0.2em;
+    font-size: 0.875em;
+    font-weight: 600;
+}
+
+.chatlog__embed-description {
+    font-weight: 500;
+    font-size: 0.85em;
+}
+
+.chatlog__embed-fields {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.chatlog__embed-field {
+    flex: 0;
+    min-width: 100%;
+    max-width: 506px;
+    padding-top: 0.6em;
+    font-size: 0.875em;
+}
+
+.chatlog__embed-field--inline {
+    flex: 1;
+    flex-basis: auto;
+    min-width: 150px;
+}
+
+.chatlog__embed-field-name {
+    margin-bottom: 0.2em;
+    font-weight: 600;
+}
+
+.chatlog__embed-field-value {
+    font-weight: 500;
+}
+
+.chatlog__embed-thumbnail {
+    flex: 0;
+    margin-left: 1.2em;
+    max-width: 80px;
+    max-height: 80px;
+    border-radius: 3px;
+}
+
+.chatlog__embed-image-container {
+    margin-top: 0.6em;
+}
+
+.chatlog__embed-image {
+    max-width: 500px;
+    max-height: 400px;
+    border-radius: 3px;
+}
+
+.chatlog__embed-footer {
+    margin-top: 0.6em;
+}
+
+.chatlog__embed-footer-icon {
+    margin-right: 0.2em;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.chatlog__embed-footer-text {
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+.chatlog__reactions {
+    display: flex;
+}
+
+.chatlog__reaction {
+    display: flex;
+    align-items: center;
+    margin: 0.35em 0.1em 0.1em 0.1em;
+    padding: 0.2em 0.35em;
+    border-radius: 3px;
+}
+
+.chatlog__reaction-count {
+    min-width: 9px;
+    margin-left: 0.35em;
+    font-size: 0.875em;
+}
+
+.chatlog__bot-tag {
+    position: relative;
+    top: -.2em;
+    margin-left: 0.3em;
+    padding: 0.05em 0.3em;
+    border-radius: 3px;
+    vertical-align: middle;
+    line-height: 1.3;
+    background: #7289da;
+    color: #ffffff;
+    font-size: 0.625em;
+    font-weight: 500;
+}
+
+/* Postamble */
+
+.postamble {
+    margin: 1.4em 0.3em 0.6em 0.3em;
+    padding: 1em;
+    border-top: 1px solid;
+}
+    </style>
+    <style>
+        /* General */
+
+body {
+    background-color: #36393e;
+    color: #dcddde;
+}
+
+a {
+    color: #0096cf;
+}
+
+.spoiler-text {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.spoiler--hidden .spoiler-text {
+    background-color: #202225;
+}
+
+.spoiler--hidden:hover .spoiler-text {
+    background-color: rgba(32, 34, 37, 0.8);
+}
+
+.quote {
+    border-color: #4f545c;
+}
+
+.pre {
+    background-color: #2f3136 !important;
+}
+
+.pre--multiline {
+    border-color: #282b30 !important;
+    color: #b9bbbe !important;
+}
+
+/* === Preamble === */
+
+.preamble__entry {
+    color: #ffffff;
+}
+
+/* Chatlog */
+
+.chatlog__message-group {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.chatlog__reference-symbol {
+    border-color: #4f545c;
+}
+
+.chatlog__reference {
+    color: #b5b6b8;
+}
+
+.chatlog__reference-link {
+    color: #b5b6b8;
+}
+
+.chatlog__reference-link:hover {
+    color: #ffffff;
+}
+
+.chatlog__reference-edited-timestamp {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.chatlog__author-name {
+    color: #ffffff;
+}
+
+.chatlog__timestamp {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.chatlog__message--highlighted {
+    background-color: rgba(114, 137, 218, 0.2) !important;
+}
+
+.chatlog__message--pinned {
+    background-color: rgba(249, 168, 37, 0.05);
+}
+
+.chatlog__attachment-container {
+    background-color: #2f3136;
+    border-color: #292b2f;
+}
+
+.chatlog__edited-timestamp {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.chatlog__embed-color-pill--default {
+    background-color: rgba(79, 84, 92, 1);
+}
+
+.chatlog__embed-content-container {
+    background-color: rgba(46, 48, 54, 0.3);
+    border-color: rgba(46, 48, 54, 0.6);
+}
+
+.chatlog__embed-author-name {
+    color: #ffffff;
+}
+
+.chatlog__embed-author-name-link {
+    color: #ffffff;
+}
+
+.chatlog__embed-title {
+    color: #ffffff;
+}
+
+.chatlog__embed-description {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.chatlog__embed-field-name {
+    color: #ffffff;
+}
+
+.chatlog__embed-field-value {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.chatlog__embed-footer {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.chatlog__reaction {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.chatlog__reaction-count {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Postamble */
+
+.postamble {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.postamble__entry {
+    color: #ffffff;
+}
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/solarized-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pre--multiline').forEach(block => hljs.highlightBlock(block));
+        });
+    </script>
+
+    <script>
+        function scrollToMessage(event, id) {
+            var element = document.getElementById('message-' + id);
+
+            if (element) {
+                event.preventDefault();
+
+                element.classList.add('chatlog__message--highlighted');
+
+                window.scrollTo({
+                    top: element.getBoundingClientRect().top - document.body.getBoundingClientRect().top - (window.innerHeight / 2),
+                    behavior: 'smooth'
+                });
+
+                window.setTimeout(function() {
+                    element.classList.remove('chatlog__message--highlighted');
+                }, 2000);
+            }
+        }
+
+        function showSpoiler(event, element) {
+            if (element && element.classList.contains('spoiler--hidden')) {
+                event.preventDefault();
+                element.classList.remove('spoiler--hidden');
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="preamble">
+    <div class="preamble__guild-icon-container">
+        <img class="preamble__guild-icon" src="Mal.html_Files/0-EB806.png" alt="Guild icon">
+    </div>
+    <div class="preamble__entries-container">
+        <div class="preamble__entry">Direct Messages</div>
+        <div class="preamble__entry">Private / Mal</div>
+
+
+            <div class="preamble__entry preamble__entry--small">
+After 01-Feb-21 12:00 AM            </div>
+    </div>
+</div>
+
+<div class="chatlog">
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">01-Feb-21 06:35 PM</span>
+
+            <div class="chatlog__message " data-message-id="805959472039854132" id="message-805959472039854132">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">hey there</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="805959533343932446" id="message-805959533343932446">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">would you happen to know how to install those arena trackers?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">01-Feb-21 07:14 PM</span>
+
+            <div class="chatlog__message " data-message-id="805969343404834846" id="message-805969343404834846">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I do....</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">02-Feb-21 03:25 PM</span>
+
+            <div class="chatlog__message " data-message-id="806274135453990924" id="message-806274135453990924">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">can you help in installing them in our arena server?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">02-Feb-21 04:06 PM</span>
+
+            <div class="chatlog__message " data-message-id="806284504280989737" id="message-806284504280989737">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I can. Do I have the rights on our server?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">02-Feb-21 07:04 PM</span>
+
+            <div class="chatlog__message " data-message-id="806329255964573726" id="message-806329255964573726">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I can have It up and running super quick if I have the rights to do it</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">02-Feb-21 07:18 PM</span>
+
+            <div class="chatlog__message " data-message-id="806332646170427402" id="message-806332646170427402">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">hey</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="806332669813981194" id="message-806332669813981194">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">yeah what do you need</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">02-Feb-21 07:21 PM</span>
+
+            <div class="chatlog__message " data-message-id="806333495462854667" id="message-806333495462854667">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Yeah I think I just need access to manage the server</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="806333568166920192" id="message-806333568166920192">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Let me check the setting</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="806334160444194816" id="message-806334160444194816">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Manage channels maybe?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="806334293928312872" id="message-806334293928312872">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I’ll try when I get home from Scouts with the little girl</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">02-Feb-21 07:24 PM</span>
+
+            <div class="chatlog__message " data-message-id="806334390295593001" id="message-806334390295593001">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">alright cool, thanks</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:45 PM</span>
+
+            <div class="chatlog__message " data-message-id="807487024020848700" id="message-807487024020848700">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Where&#39;d that cool fricks channel go? So many interesting thoughts there.</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:52 PM</span>
+
+            <div class="chatlog__message " data-message-id="807488767081709588" id="message-807488767081709588">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">you weren&#39;t supposed to see our innermost thoughts there lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:52 PM</span>
+
+            <div class="chatlog__message " data-message-id="807488801923530822" id="message-807488801923530822">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807488835612704778" id="message-807488835612704778">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Oops</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807488923458732112" id="message-807488923458732112">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Inspecta really likes me<img class="emoji " alt="😂" title="😂" src="https://twemoji.maxcdn.com/2/72x72/1f602.png"></span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:53 PM</span>
+
+            <div class="chatlog__message " data-message-id="807489044765868032" id="message-807489044765868032">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">this game gets to people</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:53 PM</span>
+
+            <div class="chatlog__message " data-message-id="807489081638256640" id="message-807489081638256640">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Apparently...</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:53 PM</span>
+
+            <div class="chatlog__message " data-message-id="807489202526748683" id="message-807489202526748683">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">more like completely..</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:54 PM</span>
+
+            <div class="chatlog__message " data-message-id="807489357899497482" id="message-807489357899497482">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I mean my ideal is &quot;a rising tide lifts all boats&quot;  -kennedy</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807489643586781225" id="message-807489643586781225">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">What happened with kenya that caused so much hate?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807489721965477899" id="message-807489721965477899">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I just came into the server when all that went down</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:55 PM</span>
+
+            <div class="chatlog__message " data-message-id="807489734045335562" id="message-807489734045335562">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">it&#39;s just egos clashing</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807489946432700467" id="message-807489946432700467">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Kenya doesn&#39;t like it when he gets called out for playing how he likes when he likes</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807490009011322910" id="message-807490009011322910">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">a typical whale mentality</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:57 PM</span>
+
+            <div class="chatlog__message " data-message-id="807490073658523648" id="message-807490073658523648">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Interesting</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:57 PM</span>
+
+            <div class="chatlog__message " data-message-id="807490150879330304" id="message-807490150879330304">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">he does help out from time to time</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:57 PM</span>
+
+            <div class="chatlog__message " data-message-id="807490168906055730" id="message-807490168906055730">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I&#39;ve pmed with him and he seems reasonable</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:58 PM</span>
+
+            <div class="chatlog__message " data-message-id="807490270584635402" id="message-807490270584635402">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">hmm</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807490356785578016" id="message-807490356785578016">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">mood swings then</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:58 PM</span>
+
+            <div class="chatlog__message " data-message-id="807490358900293643" id="message-807490358900293643">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Not sure what happened in the past</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807490449673158696" id="message-807490449673158696">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Again not even a year in the chat</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">05-Feb-21 11:59 PM</span>
+
+            <div class="chatlog__message " data-message-id="807490514046681088" id="message-807490514046681088">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">i think it has something to do with entitlement</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807490622897651712" id="message-807490622897651712">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">he&#39;s had a long history of hitting people in the shard</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807490710575775744" id="message-807490710575775744">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">and it coincides with the affected players&#39; payout hours</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807490753856536586" id="message-807490753856536586">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">that also includes me more than a few times</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807490873498664961" id="message-807490873498664961">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I think it just boiled over at that point in time</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:00 AM</span>
+
+            <div class="chatlog__message " data-message-id="807490879342247946" id="message-807490879342247946">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">He did mention that</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807491023692890183" id="message-807491023692890183">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">The reason I started pm with him was beacuse of a bad hit</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:01 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491096296030238" id="message-807491096296030238">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">since I think from his perception he&#39;s been helping some of the players in the shard a lot but he still gets berated for playing and climbing outside his payout time which again affects others as well</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807491243294720000" id="message-807491243294720000">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">hmm yeah i&#39;ve been noticing a lot more people dm/pm instead of letting it out publicly in the server lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:02 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491385426444288" id="message-807491385426444288">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Lol yeah you mentioned that</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807491403932106762" id="message-807491403932106762">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Tony....</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:02 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491499377819648" id="message-807491499377819648">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">you&#39;re really insightful lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:03 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491566507130931" id="message-807491566507130931">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I had an alt account in my guild that was in kenya&#39;s main is how I got a hold of him</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+        <div class="chatlog__reference-symbol">
+        </div>
+        <div class="chatlog__reference">
+                <img class="chatlog__reference-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+                <span class="chatlog__reference-name" title="Der J&#228;germeister#6032" style="">Der J&#228;germeister</span>
+                <a class="chatlog__reference-link" href="#" onclick="scrollToMessage(event, &#39;807489357899497482&#39;)">
+                    <span class="chatlog__reference-content">
+I mean my ideal is &quot;a rising tide lifts all boats&quot;  -kennedy                    </span>
+
+                </a>
+        </div>
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:03 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491616503234611" id="message-807491616503234611">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">i like that saying</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:03 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491686917865493" id="message-807491686917865493">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">That&#39;s my philosophy with this game</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:03 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491722878910546" id="message-807491722878910546">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">not sure how it holds though</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807491770383859743" id="message-807491770383859743">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">this game&#39;s player base is pretty toxic</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:04 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491780785995787" id="message-807491780785995787">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">It does, you&#39;d be surprised</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:04 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491878542770196" id="message-807491878542770196">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">or this game is so toxic that it trickles down to its players more like</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:04 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491880207777792" id="message-807491880207777792">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Nah I actually have a great relationship with a lot of folks in this game</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807491973358551060" id="message-807491973358551060">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I&#39;ve been in a lot of interesting corners of this game</span>
+
+                                <span class="chatlog__edited-timestamp" title="06-Feb-21 12:05 AM">(edited)</span>
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:04 AM</span>
+
+            <div class="chatlog__message " data-message-id="807491974751060029" id="message-807491974751060029">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Kenya has a lot of alts so I&#39;m not surprised</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807492013700022322" id="message-807492013700022322">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">i see..</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:05 AM</span>
+
+            <div class="chatlog__message " data-message-id="807492064542982144" id="message-807492064542982144">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Not kenya&#39;s alt</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:05 AM</span>
+
+            <div class="chatlog__message " data-message-id="807492137930981417" id="message-807492137930981417">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">ahh misread that disregard</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:05 AM</span>
+
+            <div class="chatlog__message " data-message-id="807492176882827294" id="message-807492176882827294">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">An alt account that was in our guild where the main was in his guild</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807492356848615425" id="message-807492356848615425">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">It recently left to go to.... Fuck what the name t something</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:06 AM</span>
+
+            <div class="chatlog__message " data-message-id="807492508393013258" id="message-807492508393013258">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">okay</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:06 AM</span>
+
+            <div class="chatlog__message " data-message-id="807492517787861033" id="message-807492517787861033">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Instinct</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807492617074900994" id="message-807492617074900994">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Either way....</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807492706560376903" id="message-807492706560376903">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Why does inspecta throw so much shade?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:07 AM</span>
+
+            <div class="chatlog__message " data-message-id="807492771769614347" id="message-807492771769614347">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I&#39;m not sure lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807492814254243881" id="message-807492814254243881">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">that&#39;s just how they or we are lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807492933804621864" id="message-807492933804621864">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">when the guys think they&#39;re being targeted daily they think that way</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807493004210077736" id="message-807493004210077736">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">when the situation gets overblown just take the high road</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:10 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493336268668929" id="message-807493336268668929">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I guess the bot will clear that up but seriously y&#39;all wonder why the server went the way it has and say it&#39;s toxic but the most shit talking I&#39;ve seen was on fricks</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:10 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493435467628544" id="message-807493435467628544">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">and that&#39;s why it was supposed to be private... lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:10 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493458457264158" id="message-807493458457264158">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:10 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493504925171712" id="message-807493504925171712">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">so it doesn&#39;t spill on general haha</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:11 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493538047852544" id="message-807493538047852544">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">But containing it doesn&#39;t make it better</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:11 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493577767911505" id="message-807493577767911505">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">can you propose a better solution?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807493659381202975" id="message-807493659381202975">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">it&#39;s just an outlet for us</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807493728973357117" id="message-807493728973357117">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">the tracker will defo clear a lot of things</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807493776615538728" id="message-807493776615538728">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I know who I have to drop down daily now lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:12 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493783280418816" id="message-807493783280418816">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Start being supportive and rather then accusing immediately ask why</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+        <div class="chatlog__reference-symbol">
+        </div>
+        <div class="chatlog__reference">
+                <img class="chatlog__reference-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+                <span class="chatlog__reference-name" title="Der J&#228;germeister#6032" style="">Der J&#228;germeister</span>
+                <a class="chatlog__reference-link" href="#" onclick="scrollToMessage(event, &#39;807493783280418816&#39;)">
+                    <span class="chatlog__reference-content">
+Start being supportive and rather then accusing immediately ask why                    </span>
+
+                </a>
+        </div>
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:12 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493839685943306" id="message-807493839685943306">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">the tracker will resolve that for sure</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:12 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493911534370827" id="message-807493911534370827">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I mean the whole joby and exile comments killed me</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:12 AM</span>
+
+            <div class="chatlog__message " data-message-id="807493927263141888" id="message-807493927263141888">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">the second part that is</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807493978245038112" id="message-807493978245038112">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">that&#39;s how I feel about cheap counters lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:13 AM</span>
+
+            <div class="chatlog__message " data-message-id="807494056523071509" id="message-807494056523071509">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Those two are long time members and then saying you(others) hit then out of principal....</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807494183626735638" id="message-807494183626735638">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Cheap counters are what make you a badass in gac</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807494242829860906" id="message-807494242829860906">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Look at my gac stats</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:14 AM</span>
+
+            <div class="chatlog__message " data-message-id="807494368826097686" id="message-807494368826097686">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">in gac, sure. but for veteran players like me it just makes arena much more complicated daily</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:14 AM</span>
+
+            <div class="chatlog__message " data-message-id="807494502381256704" id="message-807494502381256704">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">The game for a while was all about meta but counter meta is a big part of the game now</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807494567330840587" id="message-807494567330840587">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Not if you communicate</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807494641167106059" id="message-807494641167106059">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">That&#39;s what the server is for</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:15 AM</span>
+
+            <div class="chatlog__message " data-message-id="807494720962953246" id="message-807494720962953246">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">i understand what you&#39;re getting at</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:16 AM</span>
+
+            <div class="chatlog__message " data-message-id="807494813863116860" id="message-807494813863116860">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I climb with joby exile and bb8 every day no issues</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:16 AM</span>
+
+            <div class="chatlog__message " data-message-id="807494815255887892" id="message-807494815255887892">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">but I&#39;m not really sure why you&#39;re telling me all of this</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807495111461568522" id="message-807495111461568522">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I only move within the bounds near my payout hour.</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:17 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495140745805825" id="message-807495140745805825">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Dude, you wonder about the toxicity of the shard chat and you have someone saying. They want to smear shit on another shard member</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:17 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495247969910784" id="message-807495247969910784">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">yeah i said it was toxic lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:17 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495277316669471" id="message-807495277316669471">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Yeah you&#39;re one who stays within bounds</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:18 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495366470533141" id="message-807495366470533141">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">i&#39;m not denying the fact that we&#39;re toxic as well lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:18 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495389711171594" id="message-807495389711171594">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Were married to each other forever until we quit the gsme</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:18 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495443386466316" id="message-807495443386466316">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">yes I know that</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:18 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495528157151232" id="message-807495528157151232">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">It&#39;s not a guild switxh6</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:19 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495742595268620" id="message-807495742595268620">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I have no problems at all with anyone in particular in the shard</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:20 AM</span>
+
+            <div class="chatlog__message " data-message-id="807495985382555730" id="message-807495985382555730">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Sure. If I remember the chat correctly there&#39;s one person in particular that is always saying stupid shit....</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:21 AM</span>
+
+            <div class="chatlog__message " data-message-id="807496113619206175" id="message-807496113619206175">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807496149786427392" id="message-807496149786427392">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">wait is that directed toward me lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:21 AM</span>
+
+            <div class="chatlog__message " data-message-id="807496200051621915" id="message-807496200051621915">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Is it <img class="emoji " alt="😂" title="😂" src="https://twemoji.maxcdn.com/2/72x72/1f602.png"></span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:22 AM</span>
+
+            <div class="chatlog__message " data-message-id="807496309237874708" id="message-807496309237874708">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">that&#39;s why I told you the private channel wasn&#39;t for public viewing lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:22 AM</span>
+
+            <div class="chatlog__message " data-message-id="807496366237941788" id="message-807496366237941788">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Inspecta apparently knows me well apparently. Being annoying is my super power <img class="emoji " alt="😂" title="😂" src="https://twemoji.maxcdn.com/2/72x72/1f602.png"></span>
+
+                                <span class="chatlog__edited-timestamp" title="06-Feb-21 12:22 AM">(edited)</span>
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:23 AM</span>
+
+            <div class="chatlog__message " data-message-id="807496647096532995" id="message-807496647096532995">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">cause you&#39;re really perceptive lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807496741846122526" id="message-807496741846122526">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I do understand where you&#39;re coming from though</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807496820271742986" id="message-807496820271742986">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">and I think we&#39;re pretty lucky to have you in our shard</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807496902173917215" id="message-807496902173917215">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I hope I don&#39;t regret saying that lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807496965382078465" id="message-807496965382078465">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">thanks for the work on the bot</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:24 AM</span>
+
+            <div class="chatlog__message " data-message-id="807496991990480927" id="message-807496991990480927">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:24 AM</span>
+
+            <div class="chatlog__message " data-message-id="807496995270164490" id="message-807496995270164490">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">it&#39;s calmed everyone down</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:25 AM</span>
+
+            <div class="chatlog__message " data-message-id="807497271042244628" id="message-807497271042244628">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Let&#39;s see if it does... Can we change the culture?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:26 AM</span>
+
+            <div class="chatlog__message " data-message-id="807497348813029437" id="message-807497348813029437">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">how else exactly would you want to change it?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807497477124653116" id="message-807497477124653116">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">this arena shard is already way, way more peaceful than my fleet shard</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:27 AM</span>
+
+            <div class="chatlog__message " data-message-id="807497583446327317" id="message-807497583446327317">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Because everyone is too scared to talk <img class="emoji " alt="😂" title="😂" src="https://twemoji.maxcdn.com/2/72x72/1f602.png"></span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:27 AM</span>
+
+            <div class="chatlog__message " data-message-id="807497616500981760" id="message-807497616500981760">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">ahh really?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807497623380557865" id="message-807497623380557865">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">hmmm</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807497651381600296" id="message-807497651381600296">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">damn</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:27 AM</span>
+
+            <div class="chatlog__message " data-message-id="807497655093559317" id="message-807497655093559317">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">For fear of being called annoying</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:27 AM</span>
+
+            <div class="chatlog__message " data-message-id="807497708892848188" id="message-807497708892848188">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">who thinks that way?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807497735644119100" id="message-807497735644119100">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:27 AM</span>
+
+            <div class="chatlog__message " data-message-id="807497745510301737" id="message-807497745510301737">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">This is not a culture of helpfulness</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807497804871630869" id="message-807497804871630869">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Me, from my observation...</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:28 AM</span>
+
+            <div class="chatlog__message " data-message-id="807497826996453396" id="message-807497826996453396">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807497967367356456" id="message-807497967367356456">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">again, can you give me examples of what exactly needs to be changed?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:28 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498037773336609" id="message-807498037773336609">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Y&#39;all bitch that I climb with kylo rather then share how to stay on top spots</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:29 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498178991489024" id="message-807498178991489024">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">haha</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807498197068939274" id="message-807498197068939274">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">god wth</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:29 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498202692976651" id="message-807498202692976651">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">This helps people not having to change squads</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:29 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498241217658880" id="message-807498241217658880">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">did you really scroll all the way up in the channel</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:29 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498256010707004" id="message-807498256010707004">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Or remove mods</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807498312617295872" id="message-807498312617295872">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I read the whole mf thing</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:30 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498325195882527" id="message-807498325195882527">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">yeah I dunno if that could be changed</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807498436529881098" id="message-807498436529881098">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">the arena shard was a lot more competitive before</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807498475923177492" id="message-807498475923177492">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">competitive = a lot more toxic</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:30 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498506154672149" id="message-807498506154672149">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Leave the past behind</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807498581648736286" id="message-807498581648736286">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Build up people</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:31 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498619527364608" id="message-807498619527364608">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">hmmm</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:31 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498695829880902" id="message-807498695829880902">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">It makes the gsme more fun</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807498851807789086" id="message-807498851807789086">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Seeing people succeed is way cooler then bitching</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:32 AM</span>
+
+            <div class="chatlog__message " data-message-id="807498999924916264" id="message-807498999924916264">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">there&#39;s a certain extent to how much we could &quot;help&quot; out</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:33 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499221976612914" id="message-807499221976612914">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Joby and exile will be quicker to gls rotating with then then holding them down and this gsme needs payers to survive</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807499358114414613" id="message-807499358114414613">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I dont help those two at all they climb on their own merit</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:34 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499433872719912" id="message-807499433872719912">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">is anyone holding them down though when they climb?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807499469465714688" id="message-807499469465714688">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I don&#39;t think anyone&#39;s holding anyone down afaik</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:34 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499565280002068" id="message-807499565280002068">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">No but saying shit like I hot them out of principal is fuxked up</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:35 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499641859080262" id="message-807499641859080262">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">that&#39;s a veteran&#39;s mentality</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:35 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499750063996948" id="message-807499750063996948">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">But they&#39;re In an old ass shard</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:35 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499783639269378" id="message-807499783639269378">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">it doesn&#39;t mean we necessarily hold them down</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:35 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499784985378877" id="message-807499784985378877">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">And came back</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807499886194196541" id="message-807499886194196541">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">No but that thought of fuck them they suck</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:36 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499887997878313" id="message-807499887997878313">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">they get their payouts peacefully everyday don&#39;t they?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807499904532217866" id="message-807499904532217866">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">lol</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:36 AM</span>
+
+            <div class="chatlog__message " data-message-id="807499981735854101" id="message-807499981735854101">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">They do but it&#39;s because I share</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807500064314097715" id="message-807500064314097715">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Whereas kyp is like fuck everyone else</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:37 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500152012275782" id="message-807500152012275782">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">sigh yeah, really sorry you had to see how they think</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:37 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500173914669088" id="message-807500173914669088">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Fuck it&#39;s 50 crystals</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:37 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500249127976980" id="message-807500249127976980">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">the important part is they get to where they want at payout</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807500364604506132" id="message-807500364604506132">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">getting 5 year players to share or play nicely is gonna be a hard sell</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:38 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500448592298014" id="message-807500448592298014">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">But it&#39;s because I&#39;m not being stingy</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:38 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500523469013034" id="message-807500523469013034">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">do you share payout times with both of those guys? why not change payouts?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:39 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500629131788308" id="message-807500629131788308">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Time constraints and other po times</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:39 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500671405522964" id="message-807500671405522964">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">not sure if kyp really hits them down everyday</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:39 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500689034444811" id="message-807500689034444811">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">That po time fits me</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:39 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500726124150795" id="message-807500726124150795">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">i&#39;ve never noticed</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:39 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500784077242389" id="message-807500784077242389">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Others have.,.</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:40 AM</span>
+
+            <div class="chatlog__message " data-message-id="807500869113085993" id="message-807500869113085993">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">but just from a general player&#39;s perspective they&#39;re really easy to climb up to obviously</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807501011245465630" id="message-807501011245465630">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">it&#39;s probably less out of spite</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:41 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501160147582977" id="message-807501160147582977">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Sure but when I see shit like I hit then down. Out of principal makes for a toxic environment</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:41 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501306948091914" id="message-807501306948091914">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">i&#39;m not disagreeing with you regarding that statement</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:42 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501464124653578" id="message-807501464124653578">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">When I was climbing with vader I always hoped I would&#39;nt get hot down below 20</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:42 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501510769508352" id="message-807501510769508352">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">but no one in the shard is getting affected negatively and chronically by what we say in the shard chat</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:42 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501558706077707" id="message-807501558706077707">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Otherwise the vultures would stike</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:43 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501602398535701" id="message-807501602398535701">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">ummm</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:43 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501794090418196" id="message-807501794090418196">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Also I feel bad for yem. He trusts y&#39;all.,..</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:43 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501805998047273" id="message-807501805998047273">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">again it would be pretty obvious who players would hit down when they try to climb up no matter who it is</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:44 AM</span>
+
+            <div class="chatlog__message " data-message-id="807501944322916383" id="message-807501944322916383">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Nah I mean. They expect to have to use 2 refreshes</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:44 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502021749768253" id="message-807502021749768253">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">so what would you expect?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807502075298709556" id="message-807502075298709556">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">that no one would hit vader and palp comps down?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:45 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502129446387743" id="message-807502129446387743">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Nah that&#39;s gonna happen</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:45 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502191647653899" id="message-807502191647653899">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">you also have to think about it with gl users&#39; perspective</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:45 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502235759018004" id="message-807502235759018004">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">But rather then hating be helpful</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:45 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502327862132757" id="message-807502327862132757">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">lol it&#39;s being hateful and helpful simultaneously</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807502412913836043" id="message-807502412913836043">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Yem... I&#39;d rather not talk about that</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:46 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502421302837268" id="message-807502421302837268">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Nah. I don&#39;t see it that way</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:46 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502439635746828" id="message-807502439635746828">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">how so?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807502594691825675" id="message-807502594691825675">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">isn&#39;t the important part about everyone getting the best payouts possible?</span>
+
+                                <span class="chatlog__edited-timestamp" title="06-Feb-21 12:47 AM">(edited)</span>
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:47 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502609254055936" id="message-807502609254055936">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I mean 1-10 is fair game but if you can go around counter meta I always did</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807502801176494120" id="message-807502801176494120">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Sure but when. You know someone who an old shard mate spending 150 on refreshes just go around</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807502878955798530" id="message-807502878955798530">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Omg I had to spend 50 to get to 1st</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:48 AM</span>
+
+            <div class="chatlog__message " data-message-id="807502975408930848" id="message-807502975408930848">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I don&#39;t think I&#39;ve ever heard anyone else in this game having the same considerations as you</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807502992780820502" id="message-807502992780820502">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">but I respect it</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:48 AM</span>
+
+            <div class="chatlog__message " data-message-id="807503043028582411" id="message-807503043028582411">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I do it. Again a raising tide lifts all ships</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807503214948646932" id="message-807503214948646932">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">#counterculture</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/03cc472c8363ee0f3487f69c51842a80-EAA9C.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Mal#8547" data-user-id="262231911034781696" style="">Mal</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:50 AM</span>
+
+            <div class="chatlog__message " data-message-id="807503366732513290" id="message-807503366732513290">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">that&#39;s basically asking to have everyone be in a fair playing field, which in the first place isn&#39;t</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807503519644778519" id="message-807503519644778519">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">so by leaving the cheap counters above, what of the friendly gl&#39;s?</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 12:50 AM</span>
+
+            <div class="chatlog__message " data-message-id="807503527899037697" id="message-807503527899037697">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Alright can we pick up tomorrow</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807503588468981781" id="message-807503588468981781">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">Wife&#39;s not happy <img class="emoji " alt="😂" title="😂" src="https://twemoji.maxcdn.com/2/72x72/1f602.png"></span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+
+<div class="chatlog__message-group">
+    <div class="chatlog__author-avatar-container">
+        <img class="chatlog__author-avatar" src="Mal.html_Files/3863d0cf0cedaffcf3500429a63266ad-B1ABE.png" alt="Avatar">
+    </div>
+    <div class="chatlog__messages">
+        <span class="chatlog__author-name" title="Der J&#228;germeister#6032" data-user-id="352543882732634112" style="">Der J&#228;germeister</span>
+
+
+        <span class="chatlog__timestamp">06-Feb-21 02:34 PM</span>
+
+            <div class="chatlog__message " data-message-id="807710849510277241" id="message-807710849510277241">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">okay I can tell when the beer kicked in as i&#39;m rereading, sorry about that <img class="emoji " alt="😂" title="😂" src="https://twemoji.maxcdn.com/2/72x72/1f602.png"></span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+            <div class="chatlog__message " data-message-id="807712252693708821" id="message-807712252693708821">
+                    <div class="chatlog__content">
+                        <div class="markdown">
+                            <span class="preserve-whitespace">I guess we&#39;ll see what happens and i&#39;ll just start trying to be the change I&#39;d like to see on the server. Also if your fleet is worse then this that sucks. My fleet is very coordinated and works together with very little complaint. Again sorry about the rambling about half way through.</span>
+
+                        </div>
+                    </div>
+
+
+
+            </div>
+    </div>
+</div>
+
+</div>
+
+<div class="postamble">
+    <div class="postamble__entry">Exported 204 message(s)</div>
+</div>
+
+</body>
+
+</html>
